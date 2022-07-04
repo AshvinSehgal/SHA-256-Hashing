@@ -172,4 +172,6 @@ int main() {
             outputfile<<hashMessage(message)<<"\n";
         }
     }
+    inputfile.close();
+    outputfile.close();
 }
