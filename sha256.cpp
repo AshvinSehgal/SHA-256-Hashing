@@ -3,6 +3,8 @@
 #include<string>
 #include<bitset>
 #include<sstream>
+#include<fstream>
+#include<iomanip>
 using namespace std;
 
 // Defining some functions to be used later on for calculations
@@ -49,6 +51,7 @@ vector<unsigned long> padTo512Bits(vector<unsigned long> blocks) {
     return blocks;
 }
 
+// Convert 8-bit numbers to 32-bit blocks
 vector<unsigned long> bit8To32(vector<unsigned long> blocks) {
     vector<unsigned long> v(16); 
     for(int i=0;i<64;i+=4) {
@@ -62,8 +65,7 @@ vector<unsigned long> bit8To32(vector<unsigned long> blocks) {
     return v;
 }
 
-
-// Computing the hash of the padded string
+// Main hashing function
 string computeHash(vector<unsigned long> blocks) {
     // Initializing round constants
     vector<unsigned long> k = {
@@ -138,25 +140,36 @@ string computeHash(vector<unsigned long> blocks) {
     stringstream ss;
     string ans;
     for(int i = 0; i < 8; i++) {
-        ss << hex << H[i];
+        ss << hex << setw(8) << setfill('0') << H[i];
     }
     ss >> ans;
     return ans;
 }
 
-// Hash function
-void hashMessage(string message) {
+// Wrapper function
+string hashMessage(string message) {
     vector<unsigned long> blocks;
     blocks = convertToBinary(message);
     blocks = padTo512Bits(blocks);
     blocks = bit8To32(blocks);
     string hashedMessage = computeHash(blocks);
-    cout << "Hashed message: " << hashedMessage;
+    return hashedMessage;
 }
 
 int main() {
     string message;
-    cout << "Enter message to be hashed: ";
-    getline(cin, message);
-    hashMessage(message);
+
+    //For debugging purpose
+    // cout << "Enter message to be hashed: ";
+    // getline(cin, message);
+    // cout<<"Hashed message: "<<hashMessage(message);
+
+    fstream inputfile,outputfile;
+    inputfile.open("input.txt",ios::in);
+    outputfile.open("output.txt");
+    if(inputfile.is_open()) {
+        while(getline(inputfile,message)) {
+            outputfile<<hashMessage(message)<<"\n";
+        }
+    }
 }
